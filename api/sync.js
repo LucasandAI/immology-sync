@@ -1,7 +1,7 @@
 // Immology Sync — Dome -> Webflow CMS
 // Vercel Serverless Function + Cron
 
-const DOME_BASE = "https://api.dome.immo";
+const DOME_BASE = "https://pubapi.dome.immo";
 const WEBFLOW_BASE = "https://api.webflow.com/v2";
 
 // Webflow Collection IDs
@@ -39,10 +39,8 @@ async function getDomePublications() {
 
   while (page <= totalPages) {
     const res = await fetch(`${DOME_BASE}/publications/v1?page=${page}&limit=50`, {
-      method: "POST",
       headers: {
         Authorization: `DomeAuth1 ${process.env.DOME_ACCESS_KEY}:${process.env.DOME_SECRET_KEY}`,
-        "Content-Type": "application/json",
       },
     });
 
@@ -57,10 +55,8 @@ async function getDomePublications() {
     page++;
   }
 
-  // Only return published properties with mandate
-  return allPublications.filter(
-    (p) => p.status === "published" && p.property_progress === "with_mandate"
-  );
+  // Only return published properties
+  return allPublications.filter((p) => p.status === "published");
 }
 
 // --- Webflow API helpers ---
