@@ -257,9 +257,17 @@ async function sync() {
     getExistingProperties(),
   ]);
 
-  const existingBySlug = {};
+  // Match by slug OR slug starting with ref (Webflow adds suffixes like dom22086-c3a04)
+  const existingByRef = {};
   for (const item of existingProperties) {
-    existingBySlug[item.fieldData.slug] = item;
+    const slug = item.fieldData.slug;
+    // Exact match
+    existingByRef[slug] = item;
+    // Also index by base ref (before Webflow suffix)
+    const match = slug.match(/^(dom\d+)/);
+    if (match && !existingByRef[match[1]]) {
+      existingByRef[match[1]] = item;
+    }
   }
 
   log(`Webflow: ${existingProperties.length} existing properties`);
@@ -287,9 +295,9 @@ async function sync() {
     domeRefs.add(ref);
     const mapped = mapPublication(pub, locationsMap, newLocations);
 
-    if (existingBySlug[ref]) {
+    if (existingByRef[ref]) {
       // Update existing
-      const itemId = existingBySlug[ref].id;
+      const itemId = existingByRef[ref].id;
       const result = await webflowPatch(
         `/collections/${COLLECTIONS.properties}/items/${itemId}`,
         mapped
