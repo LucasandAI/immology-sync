@@ -151,6 +151,7 @@ function formatPrice(priceObj) {
 
 function truncate(str, max) {
   if (!str) return "";
+  str = str.replace(/\n/g, " ").replace(/\s+/g, " ").trim();
   if (str.length <= max) return str;
   return str.substring(0, max - 3) + "...";
 }
@@ -176,7 +177,7 @@ function mapPublication(pub, locationsMap, newLocations) {
     "property-listing---summary": truncate(pub.description || "", 241),
     "property-listing---excerpt": truncate(pub.description || "", 94),
     "property-listing---display-price": formatPrice(pub.price),
-    "property-listing---sqf": pub.size ? `${pub.size} m2` : null,
+    "property-listing---sqf": `${pub.size || pub.carrez_size || "0"} m2`,
     "property-listing---number-of-bedrooms": pub.bedrooms_count || 0,
     "property-listing---number-of-bathrooms": pub.bathrooms_count || 0,
     "property-listing---number-of-parking-spots": pub.parkings_count || 0,
